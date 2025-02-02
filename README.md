@@ -3,7 +3,7 @@
 A FastAPI-powered API that classifies numbers based on mathematical properties and provides a fun fact.
 
 ## 🌍 Live URL
-🔗 **Base URL**: [`https://your-api-name.onrender.com`](https://your-api-name.onrender.com)
+🔗 **Base URL**: [`https://your-api-name.onrender.com`](https://python-fastapi-number-classifier.onrender.com)
 
 ## 🚀 Features
 - Checks if a number is **prime**, **perfect**, **odd/even**, or an **Armstrong number**.
@@ -46,7 +46,8 @@ Edit
 bash
 Copy
 Edit
-git clone https://github.com/YOUR_USERNAME/your-repo-name.git
+git clone https://github.com/raji-ayyub/python-fastapi-number-classifier
+
 cd your-repo-name
 pip install -r requirements.txt
 uvicorn main:app --reload
