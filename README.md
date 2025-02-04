@@ -46,7 +46,10 @@ Edit
 bash
 Copy
 Edit
-git clone https://github.com/raji-ayyub/python-fastapi-number-classifier
+git clone https://github.com/raji-ayyub/python-fastapi-number-
+
+local server - http://127.0.0.1:10000/docs
+
 
 cd your-repo-name
 pip install -r requirements.txt
@@ -85,5 +88,3 @@ Edit
 git add README.md
 git commit -m "Added README"
 git push origin main
-
-
