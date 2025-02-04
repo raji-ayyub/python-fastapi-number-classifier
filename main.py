@@ -1,9 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Query
+from fastapi.responses import JSONResponse
 import requests
 
 app = FastAPI()
 
-def is_prime(n):
+def is_prime(n: int) -> bool:
+    """Check if a number is prime."""
     if n < 2:
         return False
     for i in range(2, int(n ** 0.5) + 1):
@@ -11,41 +13,50 @@ def is_prime(n):
             return False
     return True
 
-def is_perfect(n):
-    return n > 1 and sum(i for i in range(1, n) if n % i == 0) == n
+def is_perfect(n: int) -> bool:
+    """Check if a number is a perfect number."""
+    return sum(i for i in range(1, n) if n % i == 0) == n
 
-def is_armstrong(n):
-    digits = [int(d) for d in str(n)]
-    power = len(digits)
-    return sum(d ** power for d in digits) == n
+def is_armstrong(n: int) -> bool:
+    """Check if a number is an Armstrong number."""
+    return sum(int(digit) ** len(str(n)) for digit in str(n)) == n
 
-def get_digit_sum(n):
-    return sum(int(d) for d in str(n))
-
-def get_fun_fact(n):
-    response = requests.get(f"http://numbersapi.com/{n}/math?json")
-    if response.status_code == 200:
-        return response.json().get("text", "No fact available")
-    return "No fact available"
+@app.get("/")
+def read_root():
+    """Root endpoint with a welcome message."""
+    return {"message": "Welcome to the Number Classification API! Use /api/classify-number?number=<your_number>"}
 
 @app.get("/api/classify-number")
-def classify_number(number: int):
-    if not isinstance(number, int):
-        raise HTTPException(status_code=400, detail={"number": str(number), "error": True})
+def classify_number(number: str = Query(..., description="Number to classify")):
+    """Classify a given number and return its properties."""
+    if not number.lstrip('-').isdigit():
+        return JSONResponse(status_code=400, content={"number": number, "error": True})
 
-    properties = ["odd" if number % 2 else "even"]
+    number = int(number)
+    properties = []
     if is_armstrong(number):
-        properties.insert(0, "armstrong")
+        properties.append("armstrong")
+    properties.append("odd" if number % 2 else "even")
 
-    result = {
+    # Fetch fact from Numbers API
+    fun_fact = "No fact found."
+    try:
+        response = requests.get(f"http://numbersapi.com/{number}/math?json=True", timeout=5)
+        if response.status_code == 200:
+            fun_fact = response.json().get("text", "No fact found.")
+    except requests.exceptions.RequestException:
+        fun_fact = "Could not retrieve fun fact."
+
+    return {
         "number": number,
         "is_prime": is_prime(number),
         "is_perfect": is_perfect(number),
         "properties": properties,
-        "digit_sum": get_digit_sum(number),
-        "fun_fact": get_fun_fact(number)
+        "digit_sum": sum(int(d) for d in str(abs(number))),
+        "fun_fact": fun_fact
     }
-    return result
+
+
 
 
 
